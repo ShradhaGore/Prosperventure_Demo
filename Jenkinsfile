@@ -3,44 +3,62 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('Build Backend Docker Image') {
             steps {
-                git 'https://github.com/RupeshMaster/Prosperventure_Demo.git'
+                dir('server') {
+                    sh 'docker build -t backend-image .'
+                }
             }
         }
 
-        stage('Build Backend Image') {
+        stage('Build Frontend Docker Image') {
             steps {
-                sh 'cd server && docker build -t prosperventure-backend:v1 .'
+                dir('client') {
+                    sh 'docker build -t frontend-image .'
+                }
             }
         }
 
-        stage('Build Frontend Image') {
+        stage('Load Images into Minikube') {
             steps {
-                sh 'cd client && docker build -t prosperventure-frontend:v1 .'
+                withEnv([
+                    'HOME=/home/gore',
+                    'MINIKUBE_HOME=/home/gore/.minikube',
+                    'KUBECONFIG=/home/gore/.kube/config'
+                ]) {
+                    sh 'minikube image load backend-image'
+                    sh 'minikube image load frontend-image'
+                }
             }
         }
 
-        stage('Run Backend Container') {
+        stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                docker rm -f prosperventure-backend-container || true
-                docker run -d --name prosperventure-backend-container \
-                -p 10000:10000 \
-                --env-file server/.env \
-                prosperventure-backend:v1
-                '''
+                withEnv([
+                    'HOME=/home/gore',
+                    'MINIKUBE_HOME=/home/gore/.minikube',
+                    'KUBECONFIG=/home/gore/.kube/config'
+                ]) {
+                    dir('k8s') {
+                        sh 'kubectl apply -f backend-deployment.yaml'
+                        sh 'kubectl apply -f backend-service.yaml'
+                        sh 'kubectl apply -f frontend-deployment.yaml'
+                        sh 'kubectl apply -f frontend-service.yaml'
+                    }
+                }
             }
         }
 
-        stage('Run Frontend Container') {
+        stage('Verify Deployment') {
             steps {
-                sh '''
-                docker rm -f prosperventure-frontend-container || true
-                docker run -d --name prosperventure-frontend-container \
-                -p 5173:5173 \
-                prosperventure-frontend:v1
-                '''
+                withEnv([
+                    'HOME=/home/gore',
+                    'MINIKUBE_HOME=/home/gore/.minikube',
+                    'KUBECONFIG=/home/gore/.kube/config'
+                ]) {
+                    sh 'kubectl get pods'
+                    sh 'kubectl get svc'
+                }
             }
         }
     }
