@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+        HOME = "/home/gore"
+        MINIKUBE_HOME = "/home/gore/.minikube"
+        KUBECONFIG = "/home/gore/.kube/config"
+    }
+
     stages {
 
         stage('Build Backend Docker Image') {
@@ -54,3 +60,4 @@ pipeline {
 
     }
 }
+     
