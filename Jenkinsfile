@@ -3,70 +3,45 @@ pipeline {
 
     stages {
 
-        stage('Build Backend Docker Image') {
+        stage('Checkout') {
             steps {
-                dir('server') {
-                    sh 'docker build -t backend-image .'
-                }
+                git 'https://github.com/RupeshMaster/Prosperventure_Demo.git'
             }
         }
 
-        stage('Build Frontend Docker Image') {
+        stage('Build Backend Image') {
             steps {
-                dir('client') {
-                    sh 'docker build -t frontend-image .'
-                }
+                sh 'cd server && docker build -t prosperventure-backend:v1 .'
             }
         }
 
-        stage('Load Images into Minikube') {
-            environment {
-                MINIKUBE_HOME = '/home/gore/.minikube'
-                KUBECONFIG = '/home/gore/.kube/config'
-            }
+        stage('Build Frontend Image') {
             steps {
-                sh 'HOME=/home/gore minikube image load backend-image'
-                sh 'HOME=/home/gore minikube image load frontend-image'
+                sh 'cd client && docker build -t prosperventure-frontend:v1 .'
             }
         }
 
-        stage('Deploy Backend') {
-            environment {
-                MINIKUBE_HOME = '/home/gore/.minikube'
-                KUBECONFIG = '/home/gore/.kube/config'
-            }
+        stage('Run Backend Container') {
             steps {
-                dir('k8s') {
-                    sh 'HOME=/home/gore kubectl apply -f backend-deployment.yaml'
-                    sh 'HOME=/home/gore kubectl apply -f backend-service.yaml'
-                }
+                sh '''
+                docker rm -f prosperventure-backend-container || true
+                docker run -d --name prosperventure-backend-container \
+                -p 10000:10000 \
+                --env-file server/.env \
+                prosperventure-backend:v1
+                '''
             }
         }
 
-        stage('Deploy Frontend') {
-            environment {
-                MINIKUBE_HOME = '/home/gore/.minikube'
-                KUBECONFIG = '/home/gore/.kube/config'
-            }
+        stage('Run Frontend Container') {
             steps {
-                dir('k8s') {
-                    sh 'HOME=/home/gore kubectl apply -f frontend-deployment.yaml'
-                    sh 'HOME=/home/gore kubectl apply -f frontend-service.yaml'
-                }
+                sh '''
+                docker rm -f prosperventure-frontend-container || true
+                docker run -d --name prosperventure-frontend-container \
+                -p 5173:5173 \
+                prosperventure-frontend:v1
+                '''
             }
         }
-
-        stage('Verify Deployment') {
-            environment {
-                MINIKUBE_HOME = '/home/gore/.minikube'
-                KUBECONFIG = '/home/gore/.kube/config'
-            }
-            steps {
-                sh 'HOME=/home/gore kubectl get deployments'
-                sh 'HOME=/home/gore kubectl get pods'
-                sh 'HOME=/home/gore kubectl get svc'
-            }
-        }
-
     }
-}    
+}
