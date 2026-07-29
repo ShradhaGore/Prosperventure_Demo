@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        HOME = "/home/gore"
-        MINIKUBE_HOME = "/home/gore/.minikube"
-        KUBECONFIG = "/home/gore/.kube/config"
-    }
-
     stages {
 
         stage('Build Backend Docker Image') {
@@ -26,38 +20,53 @@ pipeline {
         }
 
         stage('Load Images into Minikube') {
+            environment {
+                MINIKUBE_HOME = '/home/gore/.minikube'
+                KUBECONFIG = '/home/gore/.kube/config'
+            }
             steps {
-                sh 'minikube image load backend-image'
-                sh 'minikube image load frontend-image'
+                sh 'HOME=/home/gore minikube image load backend-image'
+                sh 'HOME=/home/gore minikube image load frontend-image'
             }
         }
 
         stage('Deploy Backend') {
+            environment {
+                MINIKUBE_HOME = '/home/gore/.minikube'
+                KUBECONFIG = '/home/gore/.kube/config'
+            }
             steps {
                 dir('k8s') {
-                    sh 'kubectl apply -f backend-deployment.yaml'
-                    sh 'kubectl apply -f backend-service.yaml'
+                    sh 'HOME=/home/gore kubectl apply -f backend-deployment.yaml'
+                    sh 'HOME=/home/gore kubectl apply -f backend-service.yaml'
                 }
             }
         }
 
         stage('Deploy Frontend') {
+            environment {
+                MINIKUBE_HOME = '/home/gore/.minikube'
+                KUBECONFIG = '/home/gore/.kube/config'
+            }
             steps {
                 dir('k8s') {
-                    sh 'kubectl apply -f frontend-deployment.yaml'
-                    sh 'kubectl apply -f frontend-service.yaml'
+                    sh 'HOME=/home/gore kubectl apply -f frontend-deployment.yaml'
+                    sh 'HOME=/home/gore kubectl apply -f frontend-service.yaml'
                 }
             }
         }
 
         stage('Verify Deployment') {
+            environment {
+                MINIKUBE_HOME = '/home/gore/.minikube'
+                KUBECONFIG = '/home/gore/.kube/config'
+            }
             steps {
-                sh 'kubectl get deployments'
-                sh 'kubectl get pods'
-                sh 'kubectl get svc'
+                sh 'HOME=/home/gore kubectl get deployments'
+                sh 'HOME=/home/gore kubectl get pods'
+                sh 'HOME=/home/gore kubectl get svc'
             }
         }
 
     }
-}
-     
+}    
