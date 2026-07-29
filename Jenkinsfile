@@ -6,7 +6,7 @@ pipeline {
         stage('Build Backend Docker Image') {
             steps {
                 dir('server') {
-                    sh 'docker build -t backend-image .'
+                    sh 'DOCKER_BUILDKIT=0 docker build -t backend-image .'
                 }
             }
         }
@@ -14,7 +14,7 @@ pipeline {
         stage('Build Frontend Docker Image') {
             steps {
                 dir('client') {
-                    sh 'docker build -t frontend-image .'
+                    sh 'DOCKER_BUILDKIT=0 docker build -t frontend-image .'
                 }
             }
         }
@@ -56,6 +56,7 @@ pipeline {
                     'MINIKUBE_HOME=/home/gore/.minikube',
                     'KUBECONFIG=/home/gore/.kube/config'
                 ]) {
+                    sh 'kubectl get deployments'
                     sh 'kubectl get pods'
                     sh 'kubectl get svc'
                 }
