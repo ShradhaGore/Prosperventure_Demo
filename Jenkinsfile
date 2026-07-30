@@ -3,6 +3,9 @@ pipeline {
 
     environment {
         DOCKER_BUILDKIT = '0'
+        HOME = '/var/lib/jenkins'
+        MINIKUBE_HOME = '/var/lib/jenkins/.minikube'
+        KUBECONFIG = '/var/lib/jenkins/.kube/config'
     }
 
     stages {
@@ -11,8 +14,8 @@ pipeline {
             steps {
                 dir('server') {
                     sh '''
-                    export DOCKER_BUILDKIT=0
-                    docker build -t backend-image .
+                        export DOCKER_BUILDKIT=0
+                        docker build -t backend-image .
                     '''
                 }
             }
@@ -22,8 +25,8 @@ pipeline {
             steps {
                 dir('client') {
                     sh '''
-                    export DOCKER_BUILDKIT=0
-                    docker build -t frontend-image .
+                        export DOCKER_BUILDKIT=0
+                        docker build -t frontend-image .
                     '''
                 }
             }
@@ -31,58 +34,34 @@ pipeline {
 
         stage('Load Images into Minikube') {
             steps {
-                withEnv([
-                    'HOME=/home/gore',
-                    'MINIKUBE_HOME=/home/gore/.minikube',
-                    'KUBECONFIG=/home/gore/.kube/config'
-                ]) {
-                    sh 'minikube image load backend-image'
-                    sh 'minikube image load frontend-image'
-                }
+                sh 'minikube image load backend-image'
+                sh 'minikube image load frontend-image'
             }
         }
 
         stage('Deploy Backend') {
             steps {
-                withEnv([
-                    'HOME=/home/gore',
-                    'MINIKUBE_HOME=/home/gore/.minikube',
-                    'KUBECONFIG=/home/gore/.kube/config'
-                ]) {
-                    dir('k8s') {
-                        sh 'kubectl apply -f backend-deployment.yaml'
-                        sh 'kubectl apply -f backend-service.yaml'
-                    }
+                dir('k8s') {
+                    sh 'kubectl apply -f backend-deployment.yaml'
+                    sh 'kubectl apply -f backend-service.yaml'
                 }
             }
         }
 
         stage('Deploy Frontend') {
             steps {
-                withEnv([
-                    'HOME=/home/gore',
-                    'MINIKUBE_HOME=/home/gore/.minikube',
-                    'KUBECONFIG=/home/gore/.kube/config'
-                ]) {
-                    dir('k8s') {
-                        sh 'kubectl apply -f frontend-deployment.yaml'
-                        sh 'kubectl apply -f frontend-service.yaml'
-                    }
+                dir('k8s') {
+                    sh 'kubectl apply -f frontend-deployment.yaml'
+                    sh 'kubectl apply -f frontend-service.yaml'
                 }
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                withEnv([
-                    'HOME=/home/gore',
-                    'MINIKUBE_HOME=/home/gore/.minikube',
-                    'KUBECONFIG=/home/gore/.kube/config'
-                ]) {
-                    sh 'kubectl get deployments'
-                    sh 'kubectl get pods'
-                    sh 'kubectl get services'
-                }
+                sh 'kubectl get deployments'
+                sh 'kubectl get pods'
+                sh 'kubectl get services'
             }
         }
     }
