@@ -10,12 +10,17 @@ pipeline {
 
     stages {
 
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Build Backend Docker Image') {
             steps {
                 dir('server') {
                     sh '''
-                        export DOCKER_BUILDKIT=0
-                        docker build -t backend-image .
+                        docker build -t backend-image:latest .
                     '''
                 }
             }
@@ -25,25 +30,48 @@ pipeline {
             steps {
                 dir('client') {
                     sh '''
-                        export DOCKER_BUILDKIT=0
-                        docker build -t frontend-image .
+                        docker build -t frontend-image:latest .
                     '''
                 }
             }
         }
 
+        stage('Refresh Kubernetes Config') {
+            steps {
+                sh '''
+                    sudo mkdir -p /var/lib/jenkins/.kube
+                    sudo cp /home/gore/.kube/config /var/lib/jenkins/.kube/config
+                    sudo chown -R jenkins:jenkins /var/lib/jenkins/.kube
+                '''
+            }
+        }
+
+        stage('Verify Minikube') {
+            steps {
+                sh '''
+                    minikube status
+                    kubectl cluster-info
+                    kubectl get nodes
+                '''
+            }
+        }
+
         stage('Load Images into Minikube') {
             steps {
-                sh 'minikube image load backend-image'
-                sh 'minikube image load frontend-image'
+                sh '''
+                    minikube image load backend-image:latest
+                    minikube image load frontend-image:latest
+                '''
             }
         }
 
         stage('Deploy Backend') {
             steps {
                 dir('k8s') {
-                    sh 'kubectl apply -f backend-deployment.yaml'
-                    sh 'kubectl apply -f backend-service.yaml'
+                    sh '''
+                        kubectl apply -f backend-deployment.yaml
+                        kubectl apply -f backend-service.yaml
+                    '''
                 }
             }
         }
@@ -51,17 +79,21 @@ pipeline {
         stage('Deploy Frontend') {
             steps {
                 dir('k8s') {
-                    sh 'kubectl apply -f frontend-deployment.yaml'
-                    sh 'kubectl apply -f frontend-service.yaml'
+                    sh '''
+                        kubectl apply -f frontend-deployment.yaml
+                        kubectl apply -f frontend-service.yaml
+                    '''
                 }
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                sh 'kubectl get deployments'
-                sh 'kubectl get pods'
-                sh 'kubectl get services'
+                sh '''
+                    kubectl get deployments
+                    kubectl get pods
+                    kubectl get services
+                '''
             }
         }
     }
