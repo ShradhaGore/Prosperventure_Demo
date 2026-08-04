@@ -1,10 +1,12 @@
-# 🚀 Prosperventure Demo - DevOps Internship Project
+# Prosperventure Demo - DevOps Internship Project
 
 ## 📖 Project Overview
 
 This project was completed as part of my DevOps internship. The main objective of this project was to understand how a MERN Stack application can be deployed using modern DevOps tools and practices.
 
-Instead of developing the application from scratch, the focus of this project was on the deployment process. The project covers containerization using Docker, image management with Docker Hub, deployment using Kubernetes (Minikube), and automation using Jenkins CI/CD Pipeline.
+Instead of developing the application from scratch, the focus of this project was on the deployment process. The project covers source code management using Git and GitHub, containerization using Docker, image management using Docker Hub, deployment using Kubernetes (Minikube), and automation using Jenkins CI/CD Pipeline.
+
+The complete implementation was performed in a Linux environment using WSL Ubuntu on Windows.
 
 Throughout this project, I gained hands-on experience with Git, GitHub, Linux, Docker, Kubernetes, Jenkins, and CI/CD concepts.
 
@@ -15,14 +17,17 @@ Throughout this project, I gained hands-on experience with Git, GitHub, Linux, D
 - Understand the complete DevOps workflow.
 - Learn Git and GitHub for version control.
 - Containerize the MERN Stack application using Docker.
-- Push Docker images to Docker Hub.
-- Deploy the application on Kubernetes using Minikube.
+- Build and manage Docker images.
+- Deploy the application using Kubernetes.
 - Automate deployment using Jenkins Pipeline.
-- Gain practical knowledge of CI/CD.
+- Gain practical knowledge of CI/CD concepts.
+- Understand how different DevOps tools work together.
 
 ---
 
 # 🛠️ Tech Stack
+
+## Application Stack
 
 ### Frontend
 - React.js
@@ -35,7 +40,8 @@ Throughout this project, I gained hands-on experience with Git, GitHub, Linux, D
 ### Database
 - MongoDB Atlas
 
-### DevOps Tools
+## DevOps Tools
+
 - Git
 - GitHub
 - Linux (WSL Ubuntu)
@@ -49,16 +55,17 @@ Throughout this project, I gained hands-on experience with Git, GitHub, Linux, D
 
 # 📂 Project Structure
 
-```
+```text
 Prosperventure_Demo/
+
 │
 ├── client/
 │   ├── Dockerfile
-│   └── React Frontend
+│   └── React Frontend Application
 │
 ├── server/
 │   ├── Dockerfile
-│   └── Express Backend
+│   └── Express Backend Application
 │
 ├── k8s/
 │   ├── backend-deployment.yaml
@@ -67,172 +74,169 @@ Prosperventure_Demo/
 │   └── frontend-service.yaml
 │
 ├── Jenkinsfile
+├── architecture.png
+├── screenshots/
 ├── README.md
 └── .gitignore
-```
 
----
+⚙️ Project Workflow
+Git & GitHub
+Cloned the existing Prosperventure project.
+Created a personal GitHub repository.
+Managed project versions using Git.
+Stored application code and DevOps configuration files.
+🐳 Docker Containerization
 
-# ⚙️ Project Workflow
+Docker was used to containerize the frontend and backend applications.
 
-The project was completed in different phases.
+Backend Container
 
-### Git & GitHub
+Steps performed:
 
-- Cloned the existing project.
-- Created a personal GitHub repository.
-- Managed project versions using Git.
+Created Dockerfile for Node.js and Express.js application.
+Installed required dependencies.
+Built backend Docker image.
+Tested backend using Docker container.
+Frontend Container
 
-### Docker
+Steps performed:
 
-- Created Dockerfile for the backend.
-- Created Dockerfile for the frontend.
-- Built Docker images.
-- Tested the application using Docker containers.
+Created Dockerfile for React.js application.
+Installed required dependencies.
+Built frontend Docker image.
+Tested frontend using Docker container.
 
-### Docker Hub
+Docker helped package the application with all required dependencies.
 
-- Tagged Docker images.
-- Pushed Docker images to Docker Hub.
+📦 Docker Hub
 
-### Kubernetes
+After creating Docker images locally:
 
-- Installed Minikube.
-- Created Kubernetes Deployment files.
-- Created Kubernetes Service files.
-- Deployed the application on Kubernetes.
-
-### Jenkins
-
-- Installed Jenkins.
-- Created a Jenkins Pipeline.
-- Connected Jenkins with GitHub.
-- Automated the deployment process.
-
----
-# 🐳 Docker
-
-Docker was used to containerize both the frontend and backend applications.
-
-### Backend
-- Created a Dockerfile for the Express application.
-- Installed all required dependencies.
-- Exposed the backend port.
-- Built the backend Docker image.
-
-### Frontend
-- Created a Dockerfile for the React application.
-- Installed all required dependencies.
-- Exposed the frontend port.
-- Built the frontend Docker image.
-
-Docker helped package the application with all its dependencies, making it easier to run in different environments.
-
----
-
-# 📦 Docker Hub
-
-After building the Docker images locally, they were tagged and pushed to Docker Hub. This allows the images to be stored in a central repository and used during deployment.
-
----
-
-# ☸️ Kubernetes Deployment
+Docker images were tagged.
+Images were pushed to Docker Hub.
+Docker Hub was used as a container image repository.
+☸️ Kubernetes Deployment
 
 The application was deployed locally using Kubernetes with Minikube.
 
-The following Kubernetes resources were created:
+Created Kubernetes resources:
 
-- Backend Deployment
-- Backend Service
-- Frontend Deployment
-- Frontend Service
+Backend Deployment
+Backend Service
+Frontend Deployment
+Frontend Service
 
-Deployments were used to manage application Pods, while Services were used to expose the frontend and backend for communication.
+Commands used:
 
----
+kubectl apply -f k8s/
 
-# 🔄 Jenkins CI/CD Pipeline
+Check Pods:
+
+kubectl get pods
+
+Check Services:
+
+kubectl get services
+🔄 Jenkins CI/CD Pipeline
 
 Jenkins was used to automate the deployment process.
 
-The pipeline performs the following tasks:
+Pipeline steps:
 
-1. Clone the latest source code from GitHub.
-2. Build Docker images for the backend and frontend.
-3. Load Docker images into Minikube.
-4. Deploy the application using Kubernetes manifests.
-5. Verify the deployment.
+Pull source code from GitHub.
+Build frontend and backend Docker images.
+Load Docker images into Minikube.
+Deploy application using Kubernetes YAML files.
+Verify deployment status.
 
-This automation reduces manual work and helps deploy the latest version of the application more efficiently.
+Workflow:
 
----
-
-# 📊 CI/CD Workflow
-
-The overall workflow followed in this project is shown below:
-
-```
-
-Developer
-↓
 GitHub Repository
-↓
+        |
+        ↓
 Jenkins Pipeline
-↓
+        |
+        ↓
 Docker Image Build
-↓
-Docker Hub
-↓
-Minikube (Kubernetes)
-↓
+        |
+        ↓
+Kubernetes Deployment
+        |
+        ↓
 Running Application
 
-```
 
----
+🏗️ DevOps Architecture Diagram
 
-# ⚠️ Challenges Faced
+Developer
+    |
+    ↓
+GitHub Repository
+    |
+    ↓
+Jenkins CI/CD Pipeline
+    |
+    ↓
+Docker Image Build
+    |
+    ↓
+Docker Hub Registry
+    |
+    ↓
+Kubernetes (Minikube)
+    |
+    ↓
+Running Application
 
-During this project, I faced several practical challenges, including:
 
-- Docker permission issues.
-- Docker image build errors.
-- Kubernetes deployment configuration.
-- Jenkins pipeline configuration.
-- Minikube setup.
-- Frontend and backend connectivity issues.
 
-Resolving these issues helped me better understand how DevOps tools work together in a real deployment environment.
+⚠️ Challenges Faced
 
----
+During this project, I faced practical challenges:
 
-# 🎓 Learning Outcomes
+Docker permission issues.
+Docker image build errors.
+Dependency installation issues.
+Kubernetes deployment configuration.
+Jenkins pipeline configuration.
+Minikube setup issues.
+Frontend and backend connectivity issues.
+
+Resolving these challenges helped me understand the practical working of DevOps tools.
+
+🎓 Learning Outcomes
 
 Through this project, I learned:
 
-- Git and GitHub workflow.
-- Linux command-line basics.
-- Docker image creation and containerization.
-- Docker Hub image management.
-- Kubernetes Deployments and Services.
-- Jenkins Pipeline creation.
-- CI/CD concepts.
-- Troubleshooting deployment-related issues.
+Git and GitHub workflow.
+Linux command-line basics using WSL Ubuntu.
+Docker image creation and containerization.
+Docker Hub image management.
+Kubernetes Deployments and Services.
+Jenkins CI/CD Pipeline creation.
+Application deployment troubleshooting.
 
 This project gave me hands-on experience in deploying and managing a MERN Stack application using DevOps tools.
 
----
+📸 Project Screenshots
+GitHub Repository
 
-# 📸 Project Screenshots
+Docker Images
 
-The following screenshots can be added after completing the projects.
-- GitHub Repository
-- Docker Images
-- Docker Containers
-- Kubernetes Pods
-- Kubernetes Services
-- Jenkins Dashboard
-- Successful Jenkins Pipeline
-- Running Application
+Docker Containers
 
----
+Kubernetes Pods
+
+Kubernetes Services
+
+Jenkins Pipeline Success
+
+Application Running
+
+✅ Conclusion
+
+This project helped me understand the complete DevOps lifecycle from source code management to automated deployment.
+
+By implementing Git, Docker, Jenkins, and Kubernetes together, I gained practical knowledge of CI/CD workflows and how DevOps tools work together for application deployment.
+
+The complete deployment pipeline was successfully implemented and tested using a local Kubernetes environment with Minikube.
