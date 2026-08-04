@@ -3,9 +3,6 @@ pipeline {
 
     environment {
         DOCKER_BUILDKIT = '0'
-        HOME = '/home/gore'
-        MINIKUBE_HOME = '/home/gore/.minikube'
-        KUBECONFIG = '/home/gore/.kube/config'
     }
 
     stages {
@@ -20,7 +17,7 @@ pipeline {
             steps {
                 dir('server') {
                     sh '''
-                        docker build -t backend-image:latest .
+                    docker build -t backend-image:latest .
                     '''
                 }
             }
@@ -30,7 +27,7 @@ pipeline {
             steps {
                 dir('client') {
                     sh '''
-                        docker build -t frontend-image:latest .
+                    docker build -t frontend-image:latest .
                     '''
                 }
             }
@@ -39,9 +36,15 @@ pipeline {
         stage('Verify Minikube') {
             steps {
                 sh '''
-                    minikube status
-                    kubectl cluster-info
-                    kubectl get nodes
+                sudo -u gore bash -c '
+                export HOME=/home/gore
+                export MINIKUBE_HOME=/home/gore/.minikube
+                export KUBECONFIG=/home/gore/.kube/config
+
+                minikube status
+                kubectl cluster-info
+                kubectl get nodes
+                '
                 '''
             }
         }
@@ -49,8 +52,14 @@ pipeline {
         stage('Load Images into Minikube') {
             steps {
                 sh '''
-                    minikube image load backend-image:latest
-                    minikube image load frontend-image:latest
+                sudo -u gore bash -c '
+                export HOME=/home/gore
+                export MINIKUBE_HOME=/home/gore/.minikube
+                export KUBECONFIG=/home/gore/.kube/config
+
+                minikube image load backend-image:latest
+                minikube image load frontend-image:latest
+                '
                 '''
             }
         }
@@ -59,8 +68,14 @@ pipeline {
             steps {
                 dir('k8s') {
                     sh '''
-                        kubectl apply -f backend-deployment.yaml
-                        kubectl apply -f backend-service.yaml
+                    sudo -u gore bash -c '
+                    export HOME=/home/gore
+                    export MINIKUBE_HOME=/home/gore/.minikube
+                    export KUBECONFIG=/home/gore/.kube/config
+
+                    kubectl apply -f backend-deployment.yaml
+                    kubectl apply -f backend-service.yaml
+                    '
                     '''
                 }
             }
@@ -70,8 +85,14 @@ pipeline {
             steps {
                 dir('k8s') {
                     sh '''
-                        kubectl apply -f frontend-deployment.yaml
-                        kubectl apply -f frontend-service.yaml
+                    sudo -u gore bash -c '
+                    export HOME=/home/gore
+                    export MINIKUBE_HOME=/home/gore/.minikube
+                    export KUBECONFIG=/home/gore/.kube/config
+
+                    kubectl apply -f frontend-deployment.yaml
+                    kubectl apply -f frontend-service.yaml
+                    '
                     '''
                 }
             }
@@ -80,9 +101,15 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 sh '''
-                    kubectl get deployments
-                    kubectl get pods
-                    kubectl get services
+                sudo -u gore bash -c '
+                export HOME=/home/gore
+                export MINIKUBE_HOME=/home/gore/.minikube
+                export KUBECONFIG=/home/gore/.kube/config
+
+                kubectl get deployments
+                kubectl get pods
+                kubectl get services
+                '
                 '''
             }
         }
