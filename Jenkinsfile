@@ -3,9 +3,9 @@ pipeline {
 
     environment {
         DOCKER_BUILDKIT = '0'
-        HOME = '/var/lib/jenkins'
-        MINIKUBE_HOME = '/var/lib/jenkins/.minikube'
-        KUBECONFIG = '/var/lib/jenkins/.kube/config'
+        HOME = '/home/gore'
+        MINIKUBE_HOME = '/home/gore/.minikube'
+        KUBECONFIG = '/home/gore/.kube/config'
     }
 
     stages {
@@ -33,16 +33,6 @@ pipeline {
                         docker build -t frontend-image:latest .
                     '''
                 }
-            }
-        }
-
-        stage('Refresh Kubernetes Config') {
-            steps {
-                sh '''
-                    sudo mkdir -p /var/lib/jenkins/.kube
-                    sudo cp /home/gore/.kube/config /var/lib/jenkins/.kube/config
-                    sudo chown -R jenkins:jenkins /var/lib/jenkins/.kube
-                '''
             }
         }
 
