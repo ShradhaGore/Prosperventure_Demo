@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: backend-deployment
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+      containers:
+      - name: backend
+
+        image: shradhagore08/prosperventure-backend:v1
+
+        ports:
+        - containerPort: 10000
+
+        env:
+        - name: PORT
+          value: "10000"
+
+        - name: CLIENT_URL
+          value: "http://frontend-service:5173"
+
+        - name: MONGODB_URI
+          value: "mongodb+srv://shradhagore142_db_user:F0cWlNLGN1PtxPSR@cluster0.m8ugt59.mongodb.net/?appName=Cluster0"

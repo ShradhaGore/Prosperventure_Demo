@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: frontend-deployment
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: frontend
+
+  template:
+    metadata:
+      labels:
+        app: frontend
+
+    spec:
+      containers:
+      - name: frontend
+
+        image: shradhagore08/prosperventure-frontend:v2
+
+        ports:
+        - containerPort: 5173
+
+        command:
+        - npm
+
+        args:
+        - run
+        - dev
+        - --
+        - --host
+        - 0.0.0.0

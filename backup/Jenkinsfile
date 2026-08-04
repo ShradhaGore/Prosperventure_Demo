@@ -1,0 +1,58 @@
+pipeline {
+
+    agent any
+
+    environment {
+        DOCKER_USER = "shradhagore08"
+        BACKEND_IMAGE = "shradhagore08/prosperventure-backend:v2"
+        FRONTEND_IMAGE = "shradhagore08/prosperventure-frontend:v2"
+    }
+
+    stages {
+
+        stage('Clone Code') {
+            steps {
+                git 'https://github.com/ShradhaGore/Prosperventure_Demo.git'
+            }
+        }
+
+
+        stage('Build Backend Image') {
+            steps {
+                sh '''
+                cd server
+                docker build -t $BACKEND_IMAGE .
+                '''
+            }
+        }
+
+
+        stage('Build Frontend Image') {
+            steps {
+                sh '''
+                cd client
+                docker build -t $FRONTEND_IMAGE .
+                '''
+            }
+        }
+
+
+        stage('Push Images') {
+            steps {
+                sh '''
+                docker push $BACKEND_IMAGE
+                docker push $FRONTEND_IMAGE
+                '''
+            }
+        }
+
+
+        stage('Deploy Kubernetes') {
+            steps {
+                sh '''
+                kubectl apply -f k8s/
+                '''
+            }
+        }
+    }
+}
